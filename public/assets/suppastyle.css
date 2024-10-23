@@ -199,7 +199,8 @@ hr {
 }
 
 .phrase-viewer .play-button,
-.phrase-viewer .reveal-button {
+.phrase-viewer .reveal-button,
+#update-preferences-button {
     font-size: 20px;
     padding: 0;
     background: none;
@@ -270,6 +271,19 @@ hr {
     border: 1px solid #ddd;
     cursor: pointer;
     transition: background-color 0.2s;
+}
+
+#update-preferences-form {
+    display: none;
+    margin-top: 1rem;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+#update-preferences-form p {
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
 }
 
 /* Apply :hover styles only on devices that support hover to avoid weird issues */
