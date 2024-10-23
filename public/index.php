@@ -19,6 +19,31 @@ if (!isset($_SESSION['visit_comes_from'])) {
 }
 
 if (isset($_SESSION['current_subscriber']) and $_SESSION['current_subscriber'] !== false) {
+    // Update user preferences if sent
+    if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update-preferences'])) {
+        $updateStmt = $pdo->prepare("
+        UPDATE subscribers SET
+            spanish = :spanish,
+            german = :german,
+            italian = :italian,
+            french = :french,
+            portuguese = :portuguese,
+            norwegian = :norwegian
+        WHERE id = :id
+        ");
+        $params = [
+            ':spanish' => isset($_POST['spanish']) ? 1 : 0,
+            ':german' => isset($_POST['german']) ? 1 : 0,
+            ':italian' => isset($_POST['italian']) ? 1 : 0,
+            ':french' => isset($_POST['french']) ? 1 : 0,
+            ':portuguese' => isset($_POST['portuguese']) ? 1 : 0,
+            ':norwegian' => isset($_POST['norwegian']) ? 1 : 0,
+            ':id' => $_SESSION['current_subscriber']
+        ];
+        $updateStmt->execute($params);
+    }
+
+    // Get subscriber data
     $stmt = $pdo->prepare("SELECT * FROM subscribers WHERE id = :id LIMIT 1");
     $stmt->execute([':id' => $_SESSION['current_subscriber']]);
     $subscriber = $stmt->fetch(PDO::FETCH_ASSOC);

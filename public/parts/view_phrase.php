@@ -84,7 +84,20 @@ foreach ($languages as $lang_name => $lang_code) {
     </figure>
     <?php
     if (isset($_SESSION['current_subscriber']) && isset($subscriber)) {
-        echo "<p class='subscriber-stats'><span><strong>Consecutive days:</strong> " . $subscriber['streak'] . "  </span><span><strong>Your Points:</strong> <span id='current-total-points'>" . $subscriber['points'] . "</span></span></p>";
+        echo "<p class='subscriber-stats'><span><strong>Consecutive days:</strong> " . $subscriber['streak'] . "  </span><span><strong>Your Points:</strong> <span id='current-total-points'>" . $subscriber['points'] . "</span><button id='edit-my-settings'>⚙️</button></span></p>";
+        echo '<form method="post">
+           <strong>Your languages</strong>';
+        $languages_to_practice = ['spanish', 'german', 'italian', 'french', 'portuguese', 'norwegian'];
+        foreach ($languages_to_practice as $language) {
+            echo '<input type="checkbox" name="' . $language . '" id="' . $language . '" value="1"';
+            if (!empty($subscriber[$language])) {
+                echo ' checked';
+            }
+            echo '><label for="' . $language . '">' . ucfirst($language) . '</label><br>';
+        }
+        echo '
+        <input type="submit" name="update-preferences" value="Save preferences">
+        </form>';
     }
     ?>
     <hr>
