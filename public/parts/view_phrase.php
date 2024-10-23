@@ -84,8 +84,8 @@ foreach ($languages as $lang_name => $lang_code) {
     </figure>
     <?php
     if (isset($_SESSION['current_subscriber']) && isset($subscriber)) {
-        echo "<p class='subscriber-stats'><span><strong>Consecutive days:</strong> " . $subscriber['streak'] . "  </span><span><strong>Your Points:</strong> <span id='current-total-points'>" . $subscriber['points'] . "</span><button id='edit-my-settings'>⚙️</button></span></p>";
-        echo '<form method="post">
+        echo "<p class='subscriber-stats'><span><strong>Consecutive days:</strong> " . $subscriber['streak'] . "  </span><span><strong>Your Points:</strong> <span id='current-total-points'>" . $subscriber['points'] . "</span><button id='update-preferences-button'>⚙️</button></span></p>";
+        echo '<form method="post" id="update-preferences-form" style="display:none;">
            <strong>Your languages</strong>';
         $languages_to_practice = ['spanish', 'german', 'italian', 'french', 'portuguese', 'norwegian'];
         foreach ($languages_to_practice as $language) {
@@ -227,6 +227,18 @@ foreach ($languages as $lang_name => $lang_code) {
     const audioFilesToPreload = <?php echo json_encode($audio_files_to_preload); ?>;
 
     document.addEventListener('DOMContentLoaded', function () {
+
+        // Event listener for update-preferences-button
+        const updatePreferencesButton = document.getElementById('update-preferences-button');
+        if (updatePreferencesButton) {
+            updatePreferencesButton.addEventListener('click', function () {
+                const updatePreferencesForm = document.getElementById('update-preferences-form');
+                if (updatePreferencesForm) {
+                    updatePreferencesForm.style.display = updatePreferencesForm.style.display === 'none' ? '' : 'none';
+                }
+            });
+        }
+
         // Audio playback logic
         const audioElements = {};
         let currentAudio = null;
