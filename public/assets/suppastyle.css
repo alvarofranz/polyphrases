@@ -94,13 +94,13 @@ form {
     gap: 0.5rem;
 }
 
-label {
+#subscribe-form label {
     display: block;
     margin-bottom: 0.5rem;
     font-size: 1rem;
 }
 
-input[type="email"] {
+#subscribe-form input[type="email"] {
     width: 100%;
     padding: 1rem;
     margin-bottom: 1.2rem;
@@ -109,7 +109,7 @@ input[type="email"] {
     box-sizing: border-box;
 }
 
-input[type="checkbox"] {
+#subscribe-form input[type="checkbox"] {
     margin-right: 0.5rem;
 }
 

@@ -271,7 +271,7 @@ if (isset($_GET['id']) && isset($_GET['token']) && $_SESSION['token_access_trial
     <meta property="og:type" content="website">
     <meta property="og:site_name" content="Poly Phrases">
     <link rel="icon" href="/assets/icon.png" type="image/png">
-    <link rel="stylesheet" href="/assets/suppastyle.css?version=yeah">
+    <link rel="stylesheet" href="/assets/suppastyle.css?version=yeah2">
     <!-- Google tag (gtag.js) -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-XP2B88NNS7"></script>
     <script>

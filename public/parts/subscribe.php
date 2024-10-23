@@ -2,7 +2,7 @@
     <h1>Subscribe to Poly Phrases</h1>
     <p>Receive a daily phrase in multiple languages directly to your email.</p>
     <p>Simply enter your email, choose your languages, and start your daily language practice journey!</p>
-    <form method="post" action="/subscribe" class="flex-me-down">
+    <form method="post" action="/subscribe" class="flex-me-down" id="subscribe-form">
         <label><input type="email" id="email" name="email" placeholder="your-email@example.com" required></label>
         <div class="languages-picker">
             <label><input type="checkbox" name="spanish" checked> Spanish</label>
