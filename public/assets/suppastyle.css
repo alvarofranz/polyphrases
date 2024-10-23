@@ -284,6 +284,7 @@ hr {
     display: flex;
     flex-direction: row;
     gap: 0.5rem;
+    align-items: center;
 }
 
 /* Apply :hover styles only on devices that support hover to avoid weird issues */

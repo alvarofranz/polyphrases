@@ -234,7 +234,7 @@ foreach ($languages as $lang_name => $lang_code) {
             updatePreferencesButton.addEventListener('click', function () {
                 const updatePreferencesForm = document.getElementById('update-preferences-form');
                 if (updatePreferencesForm) {
-                    updatePreferencesForm.style.display = updatePreferencesForm.style.display === 'none' ? '' : 'none';
+                    updatePreferencesForm.style.display = updatePreferencesForm.style.display === 'none' ? 'flex' : 'none';
                 }
             });
         }
