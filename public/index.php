@@ -153,7 +153,7 @@ if ($view === 'subscribe' && $_SERVER['REQUEST_METHOD'] === 'POST' && isset($_PO
 }
 
 // Handle subscriber specific tasks that require a login via email link
-if (isset($_GET['id']) && isset($_GET['token']) && $_SESSION['token_access_trials_via_link'] < 3) {
+if (isset($_GET['id']) && isset($_GET['token']) && $_SESSION['token_access_trials_via_link'] < 50) {
     $_SESSION['token_access_trials_via_link']++;
 
     $subscriber_id = urldecode($_GET['id']);
@@ -177,10 +177,8 @@ if (isset($_GET['id']) && isset($_GET['token']) && $_SESSION['token_access_trial
             }
 
             if (isset($_GET['action']) && $_GET['action'] === 'unsubscribe') {
-                if ($subscriber['verified']) {
-                    $update_stmt = $pdo->prepare("UPDATE subscribers SET verified = 8 WHERE id = :id");
-                    $update_stmt->execute([':id' => $subscriber['id']]);
-                }
+                $update_stmt = $pdo->prepare("UPDATE subscribers SET verified = 8 WHERE id = :id");
+                $update_stmt->execute([':id' => $subscriber['id']]);
                 $view = 'unsubscribed';
             }
 
