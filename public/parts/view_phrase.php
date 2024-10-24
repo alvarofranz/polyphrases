@@ -84,7 +84,7 @@ foreach ($languages as $lang_name => $lang_code) {
     </figure>
     <?php
     if (isset($_SESSION['current_subscriber']) && isset($subscriber)) {
-        echo "<p class='subscriber-stats'><span><strong>🗣️Lingupoints:</strong> <span id='current-total-points'>" . $subscriber['points'] . "</span></span><button id='update-preferences-button'>⚙️</button></p>";
+        echo "<p class='subscriber-stats'><span><strong id='current-total-points'>" . $subscriber['points'] . "</strong> Lingupoints 🗣️</span><button id='update-preferences-button'>⚙️</button></p>";
         echo '<form method="post" class="flex-me-down" id="update-preferences-form">
            <strong>Your languages</strong>';
         $languages_to_practice = ['spanish', 'german', 'italian', 'french', 'portuguese', 'norwegian'];
@@ -231,6 +231,7 @@ foreach ($languages as $lang_name => $lang_code) {
         // Event listener for update-preferences-button
         const updatePreferencesButton = document.getElementById('update-preferences-button');
         if (updatePreferencesButton) {
+            updatePreferencesButton.style.display='inline-block';
             updatePreferencesButton.addEventListener('click', function () {
                 const updatePreferencesForm = document.getElementById('update-preferences-form');
                 if (updatePreferencesForm) {
