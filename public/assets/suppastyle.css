@@ -215,10 +215,11 @@ hr {
 
 #update-preferences-button {
     display: none;
+    transition: transform 0.2s;
 }
 
 #update-preferences-button:hover {
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+    transform: rotate(360deg);
 }
 
 .phrase-viewer .play-button:hover, .play-button:active {
