@@ -230,13 +230,12 @@ foreach ($languages as $lang_name => $lang_code) {
 
         // Event listener for update-preferences-button
         const updatePreferencesButton = document.getElementById('update-preferences-button');
-        if (updatePreferencesButton) {
+        const updatePreferencesForm = document.getElementById('update-preferences-form');
+        if (updatePreferencesButton && updatePreferencesForm) {
             updatePreferencesButton.style.display='inline-block';
+            updatePreferencesForm.style.display = 'none';
             updatePreferencesButton.addEventListener('click', function () {
-                const updatePreferencesForm = document.getElementById('update-preferences-form');
-                if (updatePreferencesForm) {
-                    updatePreferencesForm.style.display = updatePreferencesForm.style.display === 'none' ? 'flex' : 'none';
-                }
+                updatePreferencesForm.style.display = updatePreferencesForm.style.display === 'none' ? 'flex' : 'none';
             });
         }
 
