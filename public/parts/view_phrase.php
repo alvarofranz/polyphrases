@@ -84,7 +84,7 @@ foreach ($languages as $lang_name => $lang_code) {
     </figure>
     <?php
     if (isset($_SESSION['current_subscriber']) && isset($subscriber)) {
-        echo "<p class='subscriber-stats'><span><strong>Consecutive days:</strong> " . $subscriber['streak'] . "  </span><span><strong>Your Points:</strong> <span id='current-total-points'>" . $subscriber['points'] . "</span><button id='update-preferences-button'>⚙️</button></span></p>";
+        echo "<p class='subscriber-stats'><span><strong>🗣️Lingupoints:</strong> <span id='current-total-points'>" . $subscriber['points'] . "</span></span><button id='update-preferences-button'>⚙️</button></p>";
         echo '<form method="post" class="flex-me-down" id="update-preferences-form">
            <strong>Your languages</strong>';
         $languages_to_practice = ['spanish', 'german', 'italian', 'french', 'portuguese', 'norwegian'];

@@ -213,6 +213,14 @@ hr {
     transition: opacity 0.2s;
 }
 
+#update-preferences-button {
+    display: none;
+}
+
+#update-preferences-button:hover {
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+}
+
 .phrase-viewer .play-button:hover, .play-button:active {
     opacity: 1;
 }
