@@ -219,7 +219,7 @@ hr {
 }
 
 #update-preferences-button:hover {
-    transform: rotate(360deg);
+    transform: rotate(30deg);
 }
 
 .phrase-viewer .play-button:hover, .play-button:active {
