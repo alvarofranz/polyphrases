@@ -229,6 +229,9 @@ Here are some examples of the type of phrases I'm looking for:\n- " . $examplesT
     {
         $stmt = $this->pdo->prepare("UPDATE phrases SET imaged = 1 WHERE id = :id");
         $stmt->execute(['id' => $id]);
+        // Output query and query result
+        $this->logDebug("<strong>Update Query:</strong> " . $stmt->queryString);
+        $this->logDebug("<strong>Update Result:</strong> " . $stmt->rowCount() . " row(s) updated");
     }
 
     public function fetchPhraseForImage($date = null)
