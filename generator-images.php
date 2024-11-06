@@ -26,6 +26,7 @@ $date = $_GET['date'] ?? null;
 $phrase = $generator->fetchPhraseForImage($date);
 
 if ($phrase) {
+    echo 'Generating image for: ' . $phrase['phrase'] . PHP_EOL;
     $imageUrl = $generator->generateImage($phrase['phrase']);
     $generator->saveImage($imageUrl, $phrase['date']);
     $generator->updateImageStatus($phrase['id']);
