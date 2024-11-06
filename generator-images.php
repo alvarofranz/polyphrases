@@ -28,6 +28,8 @@ $phrase = $generator->fetchPhraseForImage($date);
 if ($phrase) {
     echo 'Generating image for: ' . $phrase['phrase'] . PHP_EOL;
     $imageUrl = $generator->generateImage($phrase['phrase']);
+    echo 'Image URL: ' . $imageUrl . PHP_EOL;
     $generator->saveImage($imageUrl, $phrase['date']);
     $generator->updateImageStatus($phrase['id']);
+    echo 'Image saved and status updated for phrase with id ' . $phrase['id'] . PHP_EOL;
 }
