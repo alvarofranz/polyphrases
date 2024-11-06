@@ -220,8 +220,17 @@ Here are some examples of the type of phrases I'm looking for:\n- " . $examplesT
     public function saveImage($url, $date)
     {
         if ($url) {
-            $image = file_get_contents($url);
-            file_put_contents(__DIR__ . '/public/images/' . $date . '.jpg', $image);
+            $ch = curl_init($url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+            $image = curl_exec($ch);
+            curl_close($ch);
+
+            if ($image !== false) {
+                file_put_contents(__DIR__ . '/public/images/' . $date . '.jpg', $image);
+            } else {
+                $this->logDebug("Failed to fetch image from URL: $url");
+            }
         }
     }
 
