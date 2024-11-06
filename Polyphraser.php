@@ -95,10 +95,10 @@ Here are some examples of the type of phrases I'm looking for:\n- " . $examplesT
                     "content" => "Based on those examples, generate another quirky and absurd phrase in " . $tense . "."
                 ],
             ],
-            'temperature' => 0.8,
-            'max_tokens' => 80,
-            'frequency_penalty' => 0.2,
-            'presence_penalty' => 0.7,
+            'temperature' => 1,
+            'max_tokens' => 90,
+            'frequency_penalty' => 0.3,
+            'presence_penalty' => 1,
         ]);
         $data = json_decode($response);
         $phrase = $data->choices[0]->message->content ?? null;
@@ -179,7 +179,7 @@ Here are some examples of the type of phrases I'm looking for:\n- " . $examplesT
         $emailContent = '<div>' . implode("</div><div>", $this->debugLog) . '</div>';
 
         if ($this->environment === 'production' && !empty($this->adminEmail)) {
-            send_email($this->adminEmail, 'PolyGenerator - ' . uniqid(), $emailContent);
+            // send_email($this->adminEmail, 'PolyGenerator - ' . uniqid(), $emailContent);
         } else {
             echo $emailContent;
         }
