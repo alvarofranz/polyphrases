@@ -361,7 +361,7 @@ if (isset($_GET['id']) && isset($_GET['token']) && $_SESSION['token_access_trial
         <div class="example-phrase" style="' . implode(';', $randomization_power[$i]) . '">
             <a href="/' . $phrase['date'] . '"><figure>
                 <img src="/images/' . $phrase['date'] . '.jpg" alt="Day ' . $phrase['phrase'] . '">
-                <figcaption><span>' . $phrase[$languages[array_rand($languages)]] . '</span></figcaption>
+                <figcaption><span>' . truncate_with_ellipsis($phrase[$languages[array_rand($languages)]]) . '</span></figcaption>
             </figure></a>
         </div>';
             $i++;

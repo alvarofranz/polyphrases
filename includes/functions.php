@@ -17,6 +17,18 @@ function send_email($email_address, $email_subject, $email_content): bool
     }
 }
 
+// Function to get the name of a service
+function truncate_with_ellipsis($phrase, $limit = 100) {
+    // Check if the length of the phrase exceeds the limit
+    if (strlen($phrase) > $limit) {
+        // Truncate the phrase and add ellipsis
+        return substr($phrase, 0, $limit) . '...';
+    }
+    // Return the phrase unchanged if it's within the limit
+    return $phrase;
+}
+
+
 // Function to generate a token
 function generateToken($id, $email): string
 {
