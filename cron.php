@@ -1,5 +1,5 @@
 <?php
-$debug = true;
+$debug = false;
 
 // Internal debug function
 function debug_log($message) {
