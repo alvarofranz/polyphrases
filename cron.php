@@ -486,13 +486,12 @@ foreach ($subscribers as $subscriber) {
 
     // Send the email
     $subject = $phrase['phrase'];
-    $encoded_subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
 
     $do_not_update_as_sent = false;
     if ($send_email) {
         debug_log("Sending email to $email with subject $subject");
         try {
-            send_email($email, $encoded_subject, $message);
+            send_email($email, $subject, $message);
             debug_log("Email sent successfully to $email.");
         } catch (Exception $e) {
             debug_log("Error sending email to $email: " . $e->getMessage());
