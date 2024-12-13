@@ -411,15 +411,19 @@ foreach ($subscribers as $subscriber) {
     $subject = $phrase['phrase'];
     $encoded_subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
 
+    $do_not_update_as_sent = false;
     if ($send_email) {
         try {
             send_email($email, $encoded_subject, $message);
         } catch (Exception $e) {
-            echo 'Caught exception: ', $e->getMessage(), "\n";
+            error_log('Caught exception: ' . $e->getMessage() . "\n", 3, __DIR__ . '/error_log.txt');
+            $do_not_update_as_sent = true;
         }
     }
 
-    // Update the subscriber's last_sent date to today even if decided to not send (avoid recalculating ratios today)
-    $update_stmt = $pdo->prepare("UPDATE subscribers SET last_sent = :today WHERE id = :id");
-    $update_stmt->execute([':today' => $today, ':id' => $subscriber['id']]);
+    if(!$do_not_update_as_sent) {
+        // Update the subscriber's last_sent date to today even if decided to not send (avoid recalculating ratios today)
+        $update_stmt = $pdo->prepare("UPDATE subscribers SET last_sent = :today WHERE id = :id");
+        $update_stmt->execute([':today' => $today, ':id' => $subscriber['id']]);
+    }
 }
