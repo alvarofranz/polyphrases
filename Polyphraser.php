@@ -88,6 +88,7 @@ Mundane Meets Fantastical: Everyday objects should transform into something whim
 Humorous Dialogue and Exaggeration: Use casual dialogue or exaggerated emotions from objects and characters (e.g., The parrot is splitting with laughter upon seeing a group of people who repeat what the television tells them).
 Quick, Punchy Humor: Keep the humor short, with immediate punchlines or surreal outcomes (e.g., The lemon tree is fed up with giving lemons).
 Absurd Logic: Use nonsensical logic presented in a matter-of-fact tone (e.g., The refrigerator was fed up with being cold, so it bought a down jacket).
+They should not be overly complicated or long, but still creative and fun. Just like the provided examples, but with a different twist and other characters or objects.
 Here are some examples of the type of phrases I'm looking for:\n- " . $examplesText
                 ],
                 [
