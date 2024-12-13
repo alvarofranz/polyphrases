@@ -1,9 +1,31 @@
 <?php
+$debug = true;
+
+// Internal debug function
+function debug_log($message) {
+    global $debug;
+    if ($debug) {
+        $logFile = __DIR__ . '/debug_log.txt';
+        $timestamp = date('Y-m-d H:i:s');
+        $formatted_message = "[$timestamp] $message\n";
+        file_put_contents($logFile, $formatted_message, FILE_APPEND);
+    }
+}
+
+debug_log("Script started.");
+
+// Include dependencies
+debug_log("Loading dependencies...");
 require __DIR__ . '/vendor/autoload.php';
 require __DIR__ . '/includes/functions.php';
 
+debug_log("Dependencies loaded.");
+
+// Load environment variables
+debug_log("Loading environment variables...");
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
+debug_log("Environment variables loaded.");
 
 // Define a color variable for the email
 $colors = array(
@@ -21,8 +43,10 @@ $colors = array(
     '#a51890'
 );
 $emailColor = $colors[array_rand($colors)];
+debug_log("Email color selected: $emailColor");
 
 // Establish a database connection
+debug_log("Establishing database connection...");
 try {
     $pdo = new PDO(
         "mysql:host=" . $_ENV['DB_HOST'] . ";dbname=" . $_ENV['DB_NAME'] . ";charset=utf8mb4",
@@ -30,39 +54,53 @@ try {
         $_ENV['DB_PASS']
     );
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    debug_log("Database connection successful.");
 } catch (PDOException $e) {
+    debug_log("Database connection failed: " . $e->getMessage());
     die("Database connection failed: " . $e->getMessage());
 }
 
 // Fetch today's date
 $today = date('Y-m-d');
+debug_log("Today's date: $today");
 
 // Fetch today's phrase
+debug_log("Fetching today's phrase...");
 $stmt = $pdo->prepare("SELECT * FROM phrases WHERE date = :today LIMIT 1");
 $stmt->execute([':today' => $today]);
 $phrase = $stmt->fetch(PDO::FETCH_ASSOC);
 
 if (!$phrase) {
+    debug_log("No phrase found for today ($today). Exiting.");
     exit;
 }
+debug_log("Phrase found: " . print_r($phrase, true));
 
 // Fetch up to 20 verified subscribers whose last_sent is less than today
+debug_log("Fetching subscribers...");
 $stmt = $pdo->prepare("SELECT * FROM subscribers WHERE verified = 1 AND last_sent < :today LIMIT 20");
 $stmt->execute([':today' => $today]);
 $subscribers = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-// If no subscribers are found, stop the script
 if (!$subscribers) {
+    debug_log("No subscribers found to send to. Exiting.");
     exit;
 }
+debug_log("Subscribers found: " . count($subscribers));
 
+// Prepare HTML parts
 $hr_separator = '<hr style="margin: 2rem 0; border: none; border-top: 1px solid #ddd;">';
 
+// Loop through subscribers
 foreach ($subscribers as $subscriber) {
+    debug_log("Processing subscriber ID: " . $subscriber['id']);
+
     $email = $subscriber['email'];
+    debug_log("Subscriber email: $email");
 
     // Validate email address
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+        debug_log("Invalid email detected ($email). Deleting subscriber ID: " . $subscriber['id']);
         // Delete this subscriber
         $delete_stmt = $pdo->prepare("DELETE FROM subscribers WHERE id = :id");
         $delete_stmt->execute([':id' => $subscriber['id']]);
@@ -73,6 +111,7 @@ foreach ($subscribers as $subscriber) {
     $delivered = $subscriber['delivered'];
     $opens = $subscriber['opens'];
     $clicks = $subscriber['clicks'];
+    debug_log("Engagement: delivered=$delivered, opens=$opens, clicks=$clicks");
 
     // Decide whether to send email
     $send_email = false;
@@ -86,27 +125,38 @@ foreach ($subscribers as $subscriber) {
     }
 
     // Do we really wanna send to this person?
+    debug_log("Open ratio: $open_ratio%, Click ratio: $click_ratio%");
+
     if ($delivered < 3 || $click_ratio > 49 || $open_ratio > 65) {
         $send_email = true;
+        debug_log("Criteria met to send email (low delivered or high engagement).");
     } else {
         // Randomly send if open ratio under 65 but above 35
         if ($open_ratio > 35) {
-            if (mt_rand(1, 100) <= 70) {
+            $rand = mt_rand(1, 100);
+            debug_log("Open ratio is between 35% and 65%. Random check: $rand <= 70?");
+            if ($rand <= 70) {
                 $send_email = true;
+                debug_log("Random criteria met, sending email.");
+            } else {
+                debug_log("Random criteria failed, not sending email.");
             }
-            // Don't send to unengaged peepole, set them as stale
         } else {
+            // Don't send to unengaged people, set them as stale
+            debug_log("Open ratio < 35%, marking subscriber as stale (verified=6).");
             $stmt = $pdo->prepare("UPDATE subscribers SET verified = 6 WHERE id = :id");
             $stmt->execute(['id' => $subscriber['id']]);
         }
     }
 
-    echo "\nChecking subscriber: " . $subscriber['id'] . " with open ratio: " . $open_ratio . "% (" . $opens . " of " . $delivered . ") and click ratio: " . $click_ratio . "% (" . $clicks . " of " . $delivered . ") --> Send?: " . ($send_email ? 'Yes' : 'No');
+    debug_log("Send email decision: " . ($send_email ? 'Yes' : 'No'));
 
     // Generate the unsubscribe link
     $subscriber_token = generateToken($subscriber['id'], $email);
+    debug_log("Generated subscriber token: $subscriber_token");
     $unsubscribe_link = $_ENV['SITE_URL'] . '/?id=' . urlencode($subscriber['id']) . '&token=' . urlencode($subscriber_token) . '&action=unsubscribe';
 
+    // Build the message
     $message = "<h1 style='color: $emailColor;'>Today's Phrase</h1>
     <p style='font-size:16px;padding:15px;background-color:$emailColor;color:#FFF;border-radius:8px;'>"
         . htmlspecialchars($phrase['phrase']) . "</p>" . $hr_separator;
@@ -252,6 +302,7 @@ foreach ($subscribers as $subscriber) {
     // Show current consecutive days and points
     $consecutive_days = $subscriber['streak'];
     $points = $subscriber['points'];
+    debug_log("Subscriber streak: $consecutive_days, points: $points");
 
     // Singular or plural 'days'
     $day_str = $consecutive_days == 1 ? "day" : "days";
@@ -345,30 +396,52 @@ foreach ($subscribers as $subscriber) {
 
     if ($consecutive_days == 0) {
         if ($points == 0) {
-            $message .= $messages_zero_days[array_rand($messages_zero_days)];
+            $msg = $messages_zero_days[array_rand($messages_zero_days)];
+            debug_log("Using zero_days / zero_points message: $msg");
+            $message .= $msg;
         } else {
-            $message .= "You have {$points} points but haven't started practicing consistently yet! {$motivational_phrase}";
+            $msg = "You have {$points} points but haven't started practicing consistently yet! {$motivational_phrase}";
+            debug_log("Using zero_days with points message: $msg");
+            $message .= $msg;
         }
     } elseif ($points == 0) {
-        $message .= $messages_zero_points[array_rand($messages_zero_points)];
+        $msg = $messages_zero_points[array_rand($messages_zero_points)];
+        debug_log("Using zero_points message: $msg");
+        $message .= $msg;
     } else {
         // Select appropriate messages based on consecutive days
         if ($consecutive_days == 1) {
-            $message .= $messages_one_day[array_rand($messages_one_day)];
+            $msg = $messages_one_day[array_rand($messages_one_day)];
+            debug_log("Using one_day message: $msg");
+            $message .= $msg;
         } elseif ($consecutive_days == 2) {
-            $message .= $messages_two_days[array_rand($messages_two_days)];
+            $msg = $messages_two_days[array_rand($messages_two_days)];
+            debug_log("Using two_days message: $msg");
+            $message .= $msg;
         } elseif ($consecutive_days >= 3 && $consecutive_days <= 5) {
-            $message .= $messages_three_to_five_days[array_rand($messages_three_to_five_days)];
+            $msg = $messages_three_to_five_days[array_rand($messages_three_to_five_days)];
+            debug_log("Using three_to_five_days message: $msg");
+            $message .= $msg;
         } elseif ($consecutive_days >= 6 && $consecutive_days <= 10) {
-            $message .= $messages_six_to_ten_days[array_rand($messages_six_to_ten_days)];
+            $msg = $messages_six_to_ten_days[array_rand($messages_six_to_ten_days)];
+            debug_log("Using six_to_ten_days message: $msg");
+            $message .= $msg;
         } elseif ($consecutive_days >= 11 && $consecutive_days <= 20) {
-            $message .= $messages_eleven_to_twenty_days[array_rand($messages_eleven_to_twenty_days)];
+            $msg = $messages_eleven_to_twenty_days[array_rand($messages_eleven_to_twenty_days)];
+            debug_log("Using eleven_to_twenty_days message: $msg");
+            $message .= $msg;
         } elseif ($consecutive_days >= 21 && $consecutive_days <= 30) {
-            $message .= $messages_twentyone_to_thirty_days[array_rand($messages_twentyone_to_thirty_days)];
+            $msg = $messages_twentyone_to_thirty_days[array_rand($messages_twentyone_to_thirty_days)];
+            debug_log("Using twentyone_to_thirty_days message: $msg");
+            $message .= $msg;
         } elseif ($consecutive_days > 30) {
-            $message .= $messages_over_thirty_days[array_rand($messages_over_thirty_days)];
+            $msg = $messages_over_thirty_days[array_rand($messages_over_thirty_days)];
+            debug_log("Using over_thirty_days message: $msg");
+            $message .= $msg;
         } else {
-            $message .= $messages_default[array_rand($messages_default)];
+            $msg = $messages_default[array_rand($messages_default)];
+            debug_log("Using default message: $msg");
+            $message .= $msg;
         }
     }
 
@@ -397,7 +470,11 @@ foreach ($subscribers as $subscriber) {
     // Add image if exists
     $image_path = __DIR__ . '/public/images/' . $phrase['date'] . '.jpg';
     if (file_exists($image_path)) {
-        $message .= "<img src='" . $_ENV['SITE_URL'] . '/images/' . $phrase['date'] . '.jpg' . "' alt='Descriptive image for this phrase' style='width:100%;max-width:600px;height:auto;border-radius:8px;'>";
+        $image_url = $_ENV['SITE_URL'] . '/images/' . $phrase['date'] . '.jpg';
+        debug_log("Adding image: $image_url");
+        $message .= "<img src='" . $image_url . "' alt='Descriptive image for this phrase' style='width:100%;max-width:600px;height:auto;border-radius:8px;'>";
+    } else {
+        debug_log("No image found for date: " . $phrase['date']);
     }
 
     $message .= $hr_separator . '
@@ -407,23 +484,32 @@ foreach ($subscribers as $subscriber) {
         <a href="' . $unsubscribe_link . '" title="Unsubscribe from Poly Phrases">Unsubscribe</a>
     </p>';
 
-    // Send the email (Use your own mail function or mail library)
+    // Send the email
     $subject = $phrase['phrase'];
     $encoded_subject = '=?UTF-8?B?' . base64_encode($subject) . '?=';
 
     $do_not_update_as_sent = false;
     if ($send_email) {
+        debug_log("Sending email to $email with subject $subject");
         try {
             send_email($email, $encoded_subject, $message);
+            debug_log("Email sent successfully to $email.");
         } catch (Exception $e) {
+            debug_log("Error sending email to $email: " . $e->getMessage());
             error_log('Caught exception: ' . $e->getMessage() . "\n", 3, __DIR__ . '/error_log.txt');
             $do_not_update_as_sent = true;
         }
+    } else {
+        debug_log("Not sending email to $email based on engagement criteria.");
     }
 
-    if(!$do_not_update_as_sent) {
-        // Update the subscriber's last_sent date to today even if decided to not send (avoid recalculating ratios today)
+    if (!$do_not_update_as_sent) {
+        debug_log("Updating last_sent for subscriber ID: " . $subscriber['id'] . " to $today");
         $update_stmt = $pdo->prepare("UPDATE subscribers SET last_sent = :today WHERE id = :id");
         $update_stmt->execute([':today' => $today, ':id' => $subscriber['id']]);
+    } else {
+        debug_log("Not updating last_sent due to send failure for subscriber ID: " . $subscriber['id']);
     }
 }
+
+debug_log("Script ended.");
